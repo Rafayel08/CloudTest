@@ -3,8 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
 from streamlit_autorefresh import st_autorefresh
+import numpy as np
+import plotly.express as px
 
-st_autorefresh(interval=60 * 1000, key="auto_refresh")
+st_autorefresh(interval=60 * 5 * 1000, key="auto_refresh")
 
 stock = yf.Ticker("AAPL")
 
@@ -13,15 +15,15 @@ df = stock.history(period="1y")
 
 
 
-# Create figure and axes
-fig = plt.figure(figsize=(8, 5))
-ax = fig.add_subplot(1, 1, 1)
+#create Plotly figure
+fig = px.line(df, x=df.index, y="Close", title="AAPL Close Price")
+fig.update_layout(
+    xaxis_title="Date",
+    yaxis_title="Close Price",
+    hovermode="x unified",
+    height = 600,
+    width = 1800
+)
 
-# Plot on the axes
-ax.plot(df.index, df['Close'])
-ax.set_title('Close Prices')
-ax.set_xlabel('Date')
-ax.set_ylabel('Price')
-ax.grid(True)
-
-st.pyplot(fig)
+#display in Streamlit
+st.plotly_chart(fig)
