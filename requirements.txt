@@ -3,3 +3,4 @@ matplotlib
 streamlit
 yfinance
 streamlit_autorefresh
+plotly
