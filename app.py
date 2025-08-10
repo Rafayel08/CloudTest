@@ -1,29 +1,50 @@
 import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
 import yfinance as yf
-from streamlit_autorefresh import st_autorefresh
-import numpy as np
 import plotly.express as px
 
-st_autorefresh(interval=60 * 5 * 1000, key="auto_refresh")
+# Page setup
+st.set_page_config(page_title="Apple Stock Dashboard", page_icon="📈", layout="wide")
 
-stock = yf.Ticker("AAPL")
+# Cache function to avoid re-downloading
+@st.cache_data
+def get_stock_data(ticker):
+    """Download multiple timeframes of stock data at once."""
+    return {
+        "Year": yf.download(ticker, period="1y"),
+        "Month": yf.download(ticker, period="1mo"),
+        "2 Years": yf.download(ticker, period="2y")
+    }
 
-#dataframe
-df = stock.history(period="1y")
+# Title
+st.markdown(
+    "<h1 style='text-align: center; color: white;'>Apple Stock Dashboard</h1>",
+    unsafe_allow_html=True
+)
+
+ticker = "AAPL"
+
+# Get all data once
+all_data = get_stock_data(ticker)
+
+
+choice = st.radio(
+    "Select time frame",
+    ["2 Years", "Year", "Month"],
+    horizontal=True
+)
+
+data = all_data[choice]
+data.columns = data.columns.get_level_values(0) #I have this to remove the AAPL column name from each of the columns (close, low, high, etc.). yfinance adds the ticker name to each of the columns unfortunately.
 
 
 
-#create Plotly figure
-fig = px.line(df, x=df.index, y="Close", title="AAPL Close Price")
+fig = px.line(data, x=data.index, y='Close', title="AAPL Close Price")
 fig.update_layout(
     xaxis_title="Date",
     yaxis_title="Close Price",
     hovermode="x unified",
-    height = 600,
-    width = 1800
+    dragmode=False
 )
 
-#display in Streamlit
-st.plotly_chart(fig)
+# Show chart
+st.plotly_chart(fig, use_container_width=True, config={"displayModeBar": False})
