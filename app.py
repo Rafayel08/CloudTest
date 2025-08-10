@@ -1,8 +1,9 @@
 import streamlit as st
 import yfinance as yf
 import plotly.express as px
+from streamlit_autorefresh import st_autorefresh
 
-st_autorefresh(interval=60 * 5 * 1000, key="auto_refresh") #refresh every 5 minutes
+st_autorefresh(interval=60 * 5 * 1000, key="auto_refresh")
 
 # Page setup
 st.set_page_config(page_title="Apple Stock Dashboard", page_icon="📈", layout="wide")
